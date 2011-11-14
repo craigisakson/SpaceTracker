@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+	<com.runninghusky.spacetracker.NumberPicker
+		android:id="@+id/NumberPickHour" android:layout_width="100dip"
+		android:text="0" android:layout_height="wrap_content" />
+	<com.runninghusky.spacetracker.NumberPicker
+		android:id="@+id/NumberPickMinute" android:layout_width="100dip"
+		android:layout_height="wrap_content" android:layout_toRightOf="@+id/NumberPickHour"
+		android:text="0" />
+	<com.runninghusky.spacetracker.NumberPicker
+		android:text="0" android:id="@+id/NumberPickSecond"
+		android:layout_toRightOf="@+id/NumberPickMinute" android:layout_width="100dip"
+		android:layout_height="wrap_content" />
+	<Button android:id="@+id/ButtonOk" android:layout_below="@+id/NumberPickHour"
+		android:layout_height="wrap_content" android:text="Ok"
+		android:layout_width="148dip" android:paddingTop="10dip" />
+
+
+	<Button android:id="@+id/ButtonCancel" android:layout_below="@+id/NumberPickHour"
+		android:layout_width="148dip" android:layout_height="wrap_content"
+		android:layout_centerHorizontal="true" android:text="Cancel"
+		android:layout_toRightOf="@+id/ButtonOk" android:paddingTop="10dip" />
+
+</RelativeLayout>

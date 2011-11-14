@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<!-- row.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:paddingTop="4dip" android:paddingBottom="6dip"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:orientation="vertical" android:background="@color/white">
+	<TextView android:id="@+id/TextViewTime"
+		android:layout_height="wrap_content" android:paddingLeft="15dip"
+		android:layout_width="fill_parent" android:singleLine="true"
+		android:textColor="@color/black" android:textSize="20sp"
+		android:textStyle="bold" />
+	<TextView android:id="@+id/TextViewLongitude" android:layout_height="wrap_content"
+		android:paddingLeft="15dip" android:layout_width="fill_parent"
+		android:singleLine="False" android:textColor="@color/gray"
+		android:textSize="10sp" />
+	<TextView android:id="@+id/TextViewLatitude" android:layout_height="wrap_content"
+		android:paddingLeft="15dip" android:layout_width="fill_parent"
+		android:singleLine="False" android:textColor="@color/gray"
+		android:textSize="10sp" />
+	<TextView android:id="@+id/TextViewElevation" android:layout_height="wrap_content"
+		android:paddingLeft="15dip" android:layout_width="fill_parent"
+		android:singleLine="False" android:textColor="@color/gray"
+		android:textSize="10sp" />
+	<TextView android:id="@+id/TextViewSpeed" android:layout_height="wrap_content"
+		android:paddingLeft="15dip" android:layout_width="fill_parent"
+		android:singleLine="False" android:textColor="@color/gray"
+		android:textSize="10sp" />
+		
+<!--	<LinearLayout android:orientation="horizontal"-->
+<!--		android:layout_height="wrap_content" android:layout_width="fill_parent">-->
+<!--		<TextView android:id="@+id/TextViewSendPictures"-->
+<!--			android:layout_height="wrap_content" android:paddingLeft="15dip"-->
+<!--			android:layout_width="wrap_content" android:singleLine="False"-->
+<!--			android:textColor="@color/gray" android:textSize="10sp" />-->
+<!--		<TextView android:id="@+id/TextViewSendSMS"-->
+<!--			android:layout_height="wrap_content" android:paddingLeft="15dip"-->
+<!--			android:layout_width="wrap_content" android:singleLine="False"-->
+<!--			android:textColor="@color/gray" android:textSize="10sp" />-->
+<!---->
+<!---->
+<!--	</LinearLayout>-->
+	<TextView android:id="@+id/id" android:layout_height="1dip"
+		android:layout_width="fill_parent" android:visibility="invisible" />
+</LinearLayout>

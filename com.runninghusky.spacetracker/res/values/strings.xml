@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, start!</string>
+    <string name="app_name">Space Tracker</string>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="gray">#999999</color>
+	<color name="background">#DDDDDD</color>
+	<color name="backgroundup">#777777</color>
+	<color name="gradback2">#EEEEEE</color>
+	<color name="gradback">#FFFFFF</color>
+	<color name="text">#000000</color>
+</resources>

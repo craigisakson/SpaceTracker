@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:background="@color/white">
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+		<TextView android:id="@+id/Title" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:text="Create New"
+			android:gravity="center_horizontal" android:textSize="9pt"
+			android:textStyle="bold" android:textColor="@color/text"
+			android:background="@drawable/gradient" />
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+			<EditText android:id="@+id/EditTextFlightName"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:text="" android:hint="Enter Flight Name" android:singleLine="True"
+				android:layout_marginTop="5dip" />
+			<!--			<EditText android:id="@+id/EditTextSMSNumber"-->
+			<!--
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+			-->
+			<!--
+				android:text="" android:hint="Enter SMS Number/s"
+				android:singleLine="True"
+			-->
+			<!--				android:layout_marginTop="5dip" />-->
+			<TextView android:id="@+id/TextViewSMSNumber"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:text="SMS Number" android:layout_marginTop="5dip" />
+			<AutoCompleteTextView android:id="@+id/AutoCompleteTextViewSMSNumber"
+				android:layout_width="fill_parent" android:layout_height="wrap_content" />
+
+			<CheckBox android:id="@+id/CheckBoxSendSMS"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:text="Send SMS" android:textColor="@color/text" />
+			<CheckBox android:id="@+id/CheckBoxTakePictures"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:text="Take Pictures" android:textColor="@color/text" />
+
+			<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:stretchColumns="1">
+				<TableRow>
+					<TextView android:text="00:00:00" android:id="@+id/TextViewUpdateInterval"
+						android:layout_width="fill_parent" android:layout_height="wrap_content"
+						android:padding="10dip" android:textColor="@color/text"
+						android:background="@android:drawable/editbox_background_normal"
+						android:gravity="left" />
+					<TextView android:text="SMS Update Interval (hh:mm:ss)"
+						android:id="@+id/TextViewUpdateTitle" android:layout_width="70dip"
+						android:layout_height="wrap_content" android:textStyle="bold"
+						android:padding="10dip" android:layout_column="1"
+						android:textColor="@color/text" />
+				</TableRow>
+			</TableLayout>
+
+			<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+				android:layout_width="fill_parent" android:layout_height="fill_parent"
+				android:stretchColumns="1">
+				<TableRow>
+					<TextView android:text="00:00:00" android:id="@+id/TextViewPicUpdateInterval"
+						android:layout_width="fill_parent" android:layout_height="wrap_content"
+						android:padding="10dip" android:textColor="@color/text"
+						android:background="@android:drawable/editbox_background_normal"
+						android:gravity="left" />
+					<TextView android:text="Pic Update Interval (hh:mm:ss)"
+						android:id="@+id/TextViewPictureTitle" android:layout_width="70dip"
+						android:layout_height="wrap_content" android:textStyle="bold"
+						android:padding="10dip" android:layout_column="1"
+						android:textColor="@color/text" />
+				</TableRow>
+			</TableLayout>
+
+
+		</LinearLayout>
+
+		<RelativeLayout android:layout_marginTop="-50dip"
+			android:gravity="bottom" android:layout_height="wrap_content"
+			android:layout_width="fill_parent">
+			<Button android:id="@+id/ButtonSaveFlight"
+				android:layout_gravity="bottom" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Save"
+				android:layout_marginTop="5dip" />
+		</RelativeLayout>
+	</LinearLayout>
+</LinearLayout>

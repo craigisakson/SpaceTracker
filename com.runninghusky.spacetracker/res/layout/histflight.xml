@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:background="@color/white">
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+		<TextView android:id="@+id/TextViewHistTitle" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:text="Flight History"
+			android:gravity="center_horizontal" android:textSize="9pt"
+			android:textStyle="bold" android:textColor="@color/text"
+			android:background="@drawable/gradient" />
+
+		<ListView android:layout_height="fill_parent" android:id="@+id/ListViewFlightData"
+			android:layout_width="fill_parent"></ListView>
+
+<!--		<RelativeLayout android:layout_marginTop="-50dip"-->
+<!--			android:gravity="bottom" android:layout_height="wrap_content"-->
+<!--			android:layout_width="fill_parent">-->
+<!--			<Button android:id="@+id/ButtonCreateFlight"-->
+<!--				android:layout_gravity="bottom" android:layout_width="fill_parent"-->
+<!--				android:layout_height="wrap_content" android:text="Create a new flight"-->
+<!--				android:layout_marginTop="5dip" />-->
+<!--		</RelativeLayout>-->
+	</LinearLayout>
+</LinearLayout>
