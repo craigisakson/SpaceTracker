@@ -191,9 +191,15 @@ public class CameraLoggerActivity extends Activity implements
 		Camera.Parameters p = mCamera.getParameters();
 		List<Size> sizes = p.getSupportedPictureSizes();
 		Size s = sizes.get(0);
+		for (Size size : sizes) {
+			if (size.width < s.width) {
+				s = size;
+			}
+		}
 		p.setPictureSize(s.width, s.height);
 
-		p.setPreviewSize(w, h);
+		List<Size> previewSizes = p.getSupportedPreviewSizes();
+		p.setPreviewSize(previewSizes.get(0).width, previewSizes.get(0).height);
 
 		List<String> focusModes = p.getSupportedFocusModes();
 		for (String str : focusModes) {
@@ -201,10 +207,15 @@ public class CameraLoggerActivity extends Activity implements
 				p.setFocusMode(str);
 			}
 		}
-		// getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-		// WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		mCamera.setParameters(p);
+		try {
+			mCamera.setParameters(p);
+		} catch (Exception e) {
+			HlprUtil
+					.toast(
+							"Ahh SNAP! Sense sucks so your camera didn't set the parameters...  should still work though  "
+									+ String.valueOf(e), ctx, false);
+		}
 		try {
 			mCamera.setPreviewDisplay(holder);
 		} catch (IOException e) {
