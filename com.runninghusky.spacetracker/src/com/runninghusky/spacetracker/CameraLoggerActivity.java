@@ -302,7 +302,6 @@ public class CameraLoggerActivity extends Activity implements
 					msg = "Radio off";
 					break;
 				}
-				HlprUtil.toast(msg, ctx, true);
 				Calendar c = Calendar.getInstance();
 				dh = new DataHelper(ctx);
 				dh.insertSms(flightId, phoneNumber, message, c
@@ -313,6 +312,7 @@ public class CameraLoggerActivity extends Activity implements
 		}, new IntentFilter(SENT));
 
 		SmsManager sms = SmsManager.getDefault();
+		HlprUtil.toast("Sending sms message...", ctx, true);
 		sms.sendTextMessage(phoneNumber, "", message, sentPI, null);
 
 	}

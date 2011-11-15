@@ -1,6 +1,8 @@
 package com.runninghusky.spacetracker;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
@@ -191,54 +193,73 @@ public class FlightLogService extends Service {
 	public class FullLocationListener implements LocationListener {
 		@Override
 		public void onLocationChanged(Location loc) {
-			if (i == 0) {
-				lastSent = System.currentTimeMillis();
-				oldLoc = loc;
-				distance = 0;
-				i++;
-			} else {
+			try {
+				if (i == 0) {
+					lastSent = System.currentTimeMillis();
+					oldLoc = loc;
+					dh = new DataHelper(ctx);
+					distance = dh.getLastDistance(flightId);
+					dh.close();
+					i++;
+				}
+
+				distance += loc.distanceTo(oldLoc);
+
+				if (i == 0) {
+					lastSent = System.currentTimeMillis();
+					i++;
+				}
 				dh = new DataHelper(ctx);
-				distance = dh.getLastDistance(flightId);
+				dh.insertDetails(flightId, (float) loc.getLongitude(),
+						(float) loc.getLatitude(), (float) loc.getAltitude(),
+						loc.getSpeed(), loc.getTime(), loc.getAccuracy(), loc
+								.getBearing(), loc.getProvider(), distance);
 				dh.close();
+
+			} catch (Exception e) {
+				HlprUtil.toast("Error saving data... " + String.valueOf(e),
+						ctx, true);
 			}
 
-			distance += loc.distanceTo(oldLoc);
-
-			dh = new DataHelper(ctx);
-			dh.insertDetails(flightId, (float) loc.getLongitude(),
-					(float) loc.getLatitude(), (float) loc.getAltitude(),
-					loc.getSpeed(), loc.getTime(), loc.getAccuracy(),
-					loc.getBearing(), loc.getProvider(), distance);
-			dh.close();
-
+			oldLoc = loc;
 			if (f.getSendSms()
 					&& (smsInterval < (System.currentTimeMillis() - lastSent))) {
+				try {
 
-				Calendar cal = new GregorianCalendar();
-				cal.setTimeInMillis(loc.getTime());
-				String strCal = cal.get(Calendar.HOUR_OF_DAY) + ":"
-						+ cal.get(Calendar.MINUTE) + " ";
-				strCal += (cal.get(Calendar.AM_PM) == 1) ? "PM" : "AM";
-				strCal += " " + cal.get(Calendar.MONTH) + "/"
-						+ cal.get(Calendar.DAY_OF_MONTH) + "/"
-						+ cal.get(Calendar.YEAR);
-				String smsMessage = "http://maps.google.com/maps?q="
-						+ loc.getLatitude()
-						+ ","
-						+ loc.getLongitude()
-						+ "  Traveled: "
-						+ String.valueOf(HlprUtil
-								.roundTwoDecimals(distance * 0.000621371192))
-						+ " miles Current Speed: "
-						+ String.valueOf(HlprUtil.roundTwoDecimals(loc
-								.getSpeed() * 2.23693629)) + "mph at " + strCal;
+					lastSent = System.currentTimeMillis();
 
-				Log.d("sms number", f.getSmsNumber(true));
-				sendSMS(f.getSmsNumber(true), smsMessage);
-				lastSent = System.currentTimeMillis();
+					Date date = new Date();
+					SimpleDateFormat sdf = new SimpleDateFormat(
+							"HH:mm:ss MM/dd/yyyy");
+					String strCal = sdf.format(date);
+
+					sendSMS(
+							f.getSmsNumber(true),
+							"http://maps.google.com/maps?q="
+									+ loc.getLatitude()
+									+ ","
+									+ loc.getLongitude()
+									+ "  Altitude: "
+									+ String
+											.valueOf(HlprUtil
+													.roundTwoDecimals(loc
+															.getAltitude() * 3.2808399))
+									+ " feet, Traveled: "
+									+ String
+											.valueOf(HlprUtil
+													.roundTwoDecimals(distance * 0.000621371192))
+									+ " miles, Current Speed: "
+									+ String
+											.valueOf(HlprUtil
+													.roundTwoDecimals(loc
+															.getSpeed() * 2.23693629))
+									+ " at " + strCal);
+
+				} catch (Exception e) {
+					HlprUtil.toast("SMS error... " + String.valueOf(e), ctx,
+							true);
+				}
 			}
-			oldLoc = loc;
-
 		}
 
 		@Override

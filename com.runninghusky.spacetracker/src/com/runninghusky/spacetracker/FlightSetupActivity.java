@@ -26,7 +26,7 @@ import android.widget.TextView;
 
 public class FlightSetupActivity extends Activity implements Runnable {
 	private long flightId;
-	private Boolean isNew;
+	private Boolean isNew, doneLoading;
 	private Button btnSave;
 	private CheckBox cbSendPicture, cbSendSms;
 	private NumberPicker hourPicker, minutePicker, secondPicker;
@@ -35,18 +35,25 @@ public class FlightSetupActivity extends Activity implements Runnable {
 	private EditText flightName;
 	private int intHour, intMinute, intSecond;
 	private DataHelper dh;
-	private Context ctx;
 	private Flight f = new Flight();
 	private String[] numbers = { "unknown" };
+	private Context ctx;
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
 
+	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-			goBackIntent();
+			if (doneLoading) {
+				HlprUtil.toast("Changes canceled", this, true);
+				goBackIntent();
+			}else{
+				HlprUtil.toast("Please wait till loading is finsihed", this, true);
+			}
+			return true;
 		}
 
 		return super.onKeyDown(keyCode, event);
@@ -57,12 +64,13 @@ public class FlightSetupActivity extends Activity implements Runnable {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.newflight);
+		doneLoading = false;
 		ctx = this;
-
 		Bundle b = getIntent().getExtras();
 		flightId = b.getLong("flightId", 0);
 		isNew = b.getBoolean("isNew", false);
 
+		autoCompleteStuff();
 		doMoreStuff();
 		Thread thread = new Thread(this);
 		thread.start();
@@ -73,11 +81,6 @@ public class FlightSetupActivity extends Activity implements Runnable {
 		updateInterval = (TextView) findViewById(R.id.TextViewUpdateInterval);
 		picUpdateInterval = (TextView) findViewById(R.id.TextViewPicUpdateInterval);
 		flightName = (EditText) findViewById(R.id.EditTextFlightName);
-
-		textView = (AutoCompleteTextView) findViewById(R.id.AutoCompleteTextViewSMSNumber);
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				R.layout.list_item, numbers);
-		textView.setAdapter(adapter);
 
 		cbSendSms = (CheckBox) findViewById(R.id.CheckBoxSendSMS);
 		btnSave = (Button) findViewById(R.id.ButtonSaveFlight);
@@ -116,6 +119,13 @@ public class FlightSetupActivity extends Activity implements Runnable {
 			picUpdateInterval.setText(HlprUtil.convertSecondsToTime(Double
 					.valueOf(f.getPicDuration())));
 		}
+	}
+
+	private void autoCompleteStuff() {
+		textView = (AutoCompleteTextView) findViewById(R.id.AutoCompleteTextViewSMSNumber);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				R.layout.list_item, numbers);
+		textView.setAdapter(adapter);
 	}
 
 	private void saveFlight() {
@@ -272,8 +282,10 @@ public class FlightSetupActivity extends Activity implements Runnable {
 		@Override
 		public void handleMessage(Message msg) {
 			// pd.dismiss();
-			doMoreStuff();
+			autoCompleteStuff();
 			btnSave.setEnabled(true);
+			doneLoading = true;
+			HlprUtil.toast("Loading finished...", ctx, true);
 		}
 	};
 }
