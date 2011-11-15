@@ -192,7 +192,7 @@ public class CameraLoggerActivity extends Activity implements
 		List<Size> sizes = p.getSupportedPictureSizes();
 		Size s = sizes.get(0);
 		for (Size size : sizes) {
-			if (size.width < s.width) {
+			if (size.width > s.width) {
 				s = size;
 			}
 		}
