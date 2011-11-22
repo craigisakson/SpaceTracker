@@ -1,25 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:background="@color/white">
-	<LinearLayout android:orientation="vertical"
-		android:layout_width="fill_parent" android:layout_height="fill_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
 
-		<TextView android:id="@+id/Title" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:text="Flights"
-			android:gravity="center_horizontal" android:textSize="9pt"
-			android:textStyle="bold" android:textColor="@color/text"
-			android:background="@drawable/gradient" />
-		<ListView android:layout_height="fill_parent" android:id="@+id/ListViewFlights"
-			android:layout_width="fill_parent"></ListView>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
 
-		<RelativeLayout android:layout_marginTop="-50dip"
-			android:gravity="bottom" android:layout_height="wrap_content"
-			android:layout_width="fill_parent">
-			<Button android:id="@+id/ButtonCreateFlight"
-				android:layout_gravity="bottom" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="Create a new flight"
-				android:layout_marginTop="5dip" />
-		</RelativeLayout>
-	</LinearLayout>
+        <TextView
+            android:id="@+id/Title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gradient"
+            android:gravity="center_horizontal"
+            android:text="Flights"
+            android:textColor="@color/text"
+            android:textSize="9pt"
+            android:textStyle="bold" />
+
+        <ListView
+            android:id="@+id/ListViewFlights"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" 
+            android:paddingBottom="50dip"/>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-50dip"
+            android:gravity="bottom" >
+
+            <Button
+                android:id="@+id/ButtonCreateFlight"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="5dip"
+                android:text="Create a new flight" />
+        </RelativeLayout>
+    </LinearLayout>
+
 </LinearLayout>

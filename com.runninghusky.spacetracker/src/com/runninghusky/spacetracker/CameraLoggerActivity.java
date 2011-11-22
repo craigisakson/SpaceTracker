@@ -106,7 +106,12 @@ public class CameraLoggerActivity extends Activity implements
 		super.onDestroy();
 		Settings.System.putInt(getContentResolver(),
 				Settings.System.SCREEN_OFF_TIMEOUT, defTimeOut);
-
+		try{
+			//Evo 3d camera not releasing on surface destroy...
+			mCamera.release();
+		}catch(Exception e){
+			
+		}
 		if (fullLocManager != null) {
 			fullLocManager.removeUpdates(fullLocListener);
 			fullLocManager = null;
