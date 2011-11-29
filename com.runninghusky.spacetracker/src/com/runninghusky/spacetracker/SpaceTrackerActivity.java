@@ -13,24 +13,23 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.markupartist.android.widget.ActionBar;
+import com.markupartist.android.widget.ActionBar.IntentAction;
+
 public class SpaceTrackerActivity extends Activity {
-	private Button btnCreateFlight;
 	// private ProgressDialog pd;
 	private SimpleAdapter mFlight;
 	private List<FlightData> flightData = new ArrayList<FlightData>();
@@ -40,6 +39,7 @@ public class SpaceTrackerActivity extends Activity {
 	private long flightId;
 	private String flightName;
 	public Context ctx = this;
+	private ActionBar actionBar;
 
 	// for preferences...
 	String UnitPref;
@@ -68,17 +68,13 @@ public class SpaceTrackerActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		actionBar = (ActionBar) findViewById(R.id.actionbar);
+		actionBar.addAction(new IntentAction(this, createQuickAddIntent(this),
+				android.R.drawable.ic_menu_add));
 		setupStart();
 	}
 
 	private void setupStart() {
-		btnCreateFlight = (Button) findViewById(R.id.ButtonCreateFlight);
-		// add a click listener to the button
-		btnCreateFlight.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				sendSetupIntent(Long.valueOf(0), true);
-			}
-		});
 
 		this.dh = new DataHelper(this);
 		blnHistoryExist = this.dh.flightsExist();
@@ -92,7 +88,7 @@ public class SpaceTrackerActivity extends Activity {
 			this.dh.close();
 		} else {
 			lvl.setVisibility(View.INVISIBLE);
-			HlprUtil.toast("Click to create a new flight...", this, false);
+			HlprUtil.toast("Click add to create a new flight...", this, false);
 		}
 
 		ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
@@ -113,7 +109,8 @@ public class SpaceTrackerActivity extends Activity {
 						+ String.valueOf(f.getTakePic()));
 				map.put("sendsms", "Send SMS:  "
 						+ String.valueOf(f.getSendSms()));
-				map.put("distance", "Total Distance:  " + f.getDistance() + " miles");
+				map.put("distance", "Total Distance:  " + f.getDistance()
+						+ " miles");
 				mylist.add(map);
 				map = new HashMap<String, String>();
 			}
@@ -278,7 +275,7 @@ public class SpaceTrackerActivity extends Activity {
 	}
 
 	private void resetFlight(String s) {
-		final String type = "";
+		final String type = s;
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which) {
@@ -332,7 +329,7 @@ public class SpaceTrackerActivity extends Activity {
 			FileWriter writer = new FileWriter(gpxfile);
 
 			writer
-					.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n<Document>\n<name>\nSpaceTracker</name>\n<Style id=\"yellowLineGreenPoly\">\n<LineStyle>\n<color>\n7f00ffff</color>\n<width>\n4</width>\n</LineStyle>\n</Style>\n<Placemark>\n<name>\nNo name</name>\n<description>\nTrack Created by SpaceTracker</description>\n<styleUrl>\n#yellowLineGreenPoly</styleUrl>\n<LineString>\n<coordinates>\n");
+					.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n<Document>\n<name>\nSpaceTracker</name>\n<Style id=\"yellowLineGreenPoly\">\n<LineStyle>\n<color>\n7f00ffff</color>\n<width>\n4</width>\n</LineStyle>\n</Style>\n<Placemark>\n<name>\nNo name</name>\n<description>\nTrack Created by SpaceTracker</description>\n<styleUrl>\n#yellowLineGreenPoly</styleUrl>\n<LineString>\n<altitudeMode>absolute</altitudeMode>\n<extrude>1</extrude>\n<tessellate>1</tessellate>\n<coordinates>\n");
 			for (FlightData fd : flightData) {
 				writer.append(fd.getLongitude() + "," + fd.getLatitude() + ","
 						+ fd.getElevation() + "\n");
@@ -359,4 +356,15 @@ public class SpaceTrackerActivity extends Activity {
 		startActivity(Intent.createChooser(sendIntent, "Email:"));
 
 	}
+
+	private static Intent createQuickAddIntent(Context context) {
+		Intent i = new Intent(context, FlightSetupActivity.class);
+		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		Bundle b = new Bundle();
+		b.putLong("flightId", 0);
+		b.putBoolean("isNew", true);
+		i.putExtras(b);
+		return i;
+	}
+
 }

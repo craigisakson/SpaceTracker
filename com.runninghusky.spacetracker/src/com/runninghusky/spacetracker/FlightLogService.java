@@ -121,74 +121,49 @@ public class FlightLogService extends Service {
 	public void sendSMS(String pn, String m) {
 		final String phoneNumber = pn;
 		final String message = m;
-
 		String SENT = "SMS_SENT";
-		String DELIVERED = "SMS_DELIVERED";
 
 		PendingIntent sentPI = PendingIntent.getBroadcast(ctx, 0, new Intent(
 				SENT), 0);
 
-		PendingIntent deliveredPI = PendingIntent.getBroadcast(ctx, 0,
-				new Intent(DELIVERED), 0);
-
 		// ---when the SMS has been sent---
-		registerReceiver(new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context arg0, Intent arg1) {
-				String msg = "";
-				switch (getResultCode()) {
-				case Activity.RESULT_OK:
-					msg = "SMS sent";
-					break;
-				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-					msg = "Generic failure";
-					break;
-				case SmsManager.RESULT_ERROR_NO_SERVICE:
-					msg = "No service";
-					break;
-				case SmsManager.RESULT_ERROR_NULL_PDU:
-					msg = "Null PDU";
-					break;
-				case SmsManager.RESULT_ERROR_RADIO_OFF:
-					msg = "Radio off";
-					break;
-				}
-				HlprUtil.toast(msg, ctx, true);
-				Calendar c = Calendar.getInstance();
-				dh = new DataHelper(ctx);
-				dh.insertSms(flightId, phoneNumber, message,
-						c.getTimeInMillis(), msg);
-				dh.close();
+		registerReceiver(mBroadcastReceiver, new IntentFilter(SENT));
 
-			}
-		}, new IntentFilter(SENT));
-
-		// ---when the SMS has been delivered---
-		registerReceiver(new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context arg0, Intent arg1) {
-				String msg = "";
-				switch (getResultCode()) {
-				case Activity.RESULT_OK:
-					msg = "SMS delivered";
-					break;
-				case Activity.RESULT_CANCELED:
-					msg = "SMS not delivered";
-					break;
-				}
-				HlprUtil.toast(msg, ctx, true);
-				Calendar c = Calendar.getInstance();
-				dh = new DataHelper(ctx);
-				dh.insertSms(flightId, phoneNumber, message,
-						c.getTimeInMillis(), msg);
-				dh.close();
-			}
-		}, new IntentFilter(DELIVERED));
+		Calendar c = Calendar.getInstance();
+		dh = new DataHelper(ctx);
+		dh.insertSms(flightId, phoneNumber, message, c.getTimeInMillis(),
+				"sending sms");
+		dh.close();
 
 		SmsManager sms = SmsManager.getDefault();
-		sms.sendTextMessage(phoneNumber, "", message, sentPI, deliveredPI);
+		HlprUtil.toast("Sending sms message...", ctx, true);
+		sms.sendTextMessage(phoneNumber, "", message, sentPI, null);
 
 	}
+
+	BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context arg0, Intent arg1) {
+			String msg = "";
+			switch (getResultCode()) {
+			case Activity.RESULT_OK:
+				msg = "SMS sent";
+				break;
+			case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+				msg = "Generic failure";
+				break;
+			case SmsManager.RESULT_ERROR_NO_SERVICE:
+				msg = "No service";
+				break;
+			case SmsManager.RESULT_ERROR_NULL_PDU:
+				msg = "Null PDU";
+				break;
+			case SmsManager.RESULT_ERROR_RADIO_OFF:
+				msg = "Radio off";
+				break;
+			}
+		}
+	};
 
 	public class FullLocationListener implements LocationListener {
 		@Override
@@ -264,10 +239,12 @@ public class FlightLogService extends Service {
 
 		@Override
 		public void onProviderDisabled(String provider) {
+			HlprUtil.toast("GPS Disabled...", ctx, true);
 		}
 
 		@Override
 		public void onProviderEnabled(String provider) {
+			HlprUtil.toast("GPS Enabled...", ctx, true);
 		}
 
 		@Override

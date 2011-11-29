@@ -24,6 +24,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.markupartist.android.widget.ActionBar;
+
 public class FlightSetupActivity extends Activity implements Runnable {
 	private long flightId;
 	private Boolean isNew, doneLoading;
@@ -38,6 +40,7 @@ public class FlightSetupActivity extends Activity implements Runnable {
 	private Flight f = new Flight();
 	private String[] numbers = { "unknown" };
 	private Context ctx;
+	private ActionBar actionBar;
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
@@ -70,6 +73,8 @@ public class FlightSetupActivity extends Activity implements Runnable {
 		flightId = b.getLong("flightId", 0);
 		isNew = b.getBoolean("isNew", false);
 
+		actionBar = (ActionBar) findViewById(R.id.actionbar);
+		actionBar.setTitle((isNew)?"Add Flight":"Edit Flight");
 		autoCompleteStuff();
 		doMoreStuff();
 		Thread thread = new Thread(this);

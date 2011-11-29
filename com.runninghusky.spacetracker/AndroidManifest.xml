@@ -1,39 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.runninghusky.spacetracker" android:versionCode="1"
-	android:versionName="1.0">
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	<uses-permission android:name="android.permission.SEND_SMS" />
-	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.READ_CONTACTS" />
-	<uses-permission android:name="android.permission.WRITE_SETTINGS" />
-	<uses-feature android:name="android.hardware.camera" />
-	<uses-feature android:name="android.hardware.camera.autofocus" />
-	<uses-sdk android:minSdkVersion="10" />
+    package="com.runninghusky.spacetracker"
+    android:versionCode="1"
+    android:versionName="1.0" >
 
-	<supports-screens android:smallScreens="true"
-		android:normalScreens="true" android:largeScreens="true"
-		android:anyDensity="true" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
-	<application android:icon="@drawable/icon" android:label="@string/app_name">
-		<activity android:name=".SpaceTrackerActivity" android:label="@string/app_name"
-			android:configChanges="keyboard|keyboardHidden|orientation">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		<activity android:name=".FlightSetupActivity" />
-		<activity android:name=".FlightHistoryActivity" />
-		<activity android:name=".FlightMapActivity" />
-		<activity android:name=".CameraLoggerActivity" />
-		<activity android:name=".StopServiceActivity" />
-				<service android:name=".FlightLogService" />
-		<uses-library android:name="com.google.android.maps" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
-	</application>
+    <uses-sdk android:minSdkVersion="10" />
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/app_name" >
+        <activity
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:label="@string/app_name"
+            android:name=".SpaceTrackerActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".FlightSetupActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".FlightHistoryActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name=".FlightMapActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity android:name=".CameraLoggerActivity" />
+        <activity android:name=".StopServiceActivity" />
+
+        <service android:name=".FlightLogService" />
+
+        <uses-library android:name="com.google.android.maps" />
+    </application>
+
 </manifest>

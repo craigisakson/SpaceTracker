@@ -92,6 +92,9 @@ public class CameraLoggerActivity extends Activity implements
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		brightness = 0;
 
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 		setContentView(R.layout.cameralogger);
 		defTimeOut = Settings.System.getInt(getContentResolver(),
 				Settings.System.SCREEN_OFF_TIMEOUT, DELAY);
@@ -106,11 +109,12 @@ public class CameraLoggerActivity extends Activity implements
 		super.onDestroy();
 		Settings.System.putInt(getContentResolver(),
 				Settings.System.SCREEN_OFF_TIMEOUT, defTimeOut);
-		try{
-			//Evo 3d camera not releasing on surface destroy...
+		try {
+			// Evo 3d camera not releasing on surface destroy...
 			mCamera.release();
-		}catch(Exception e){
-			
+			unregisterReceiver(mBroadcastReceiver);
+		} catch (Exception e) {
+
 		}
 		if (fullLocManager != null) {
 			fullLocManager.removeUpdates(fullLocListener);
@@ -286,41 +290,43 @@ public class CameraLoggerActivity extends Activity implements
 				SENT), 0);
 
 		// ---when the SMS has been sent---
-		registerReceiver(new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context arg0, Intent arg1) {
-				String msg = "";
-				switch (getResultCode()) {
-				case Activity.RESULT_OK:
-					msg = "SMS sent";
-					break;
-				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-					msg = "Generic failure";
-					break;
-				case SmsManager.RESULT_ERROR_NO_SERVICE:
-					msg = "No service";
-					break;
-				case SmsManager.RESULT_ERROR_NULL_PDU:
-					msg = "Null PDU";
-					break;
-				case SmsManager.RESULT_ERROR_RADIO_OFF:
-					msg = "Radio off";
-					break;
-				}
-				Calendar c = Calendar.getInstance();
-				dh = new DataHelper(ctx);
-				dh.insertSms(flightId, phoneNumber, message, c
-						.getTimeInMillis(), msg);
-				dh.close();
+		registerReceiver(mBroadcastReceiver, new IntentFilter(SENT));
 
-			}
-		}, new IntentFilter(SENT));
+		Calendar c = Calendar.getInstance();
+		dh = new DataHelper(ctx);
+		dh.insertSms(flightId, phoneNumber, message, c.getTimeInMillis(),
+				"sending sms");
+		dh.close();
 
 		SmsManager sms = SmsManager.getDefault();
 		HlprUtil.toast("Sending sms message...", ctx, true);
 		sms.sendTextMessage(phoneNumber, "", message, sentPI, null);
 
 	}
+
+	BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context arg0, Intent arg1) {
+			String msg = "";
+			switch (getResultCode()) {
+			case Activity.RESULT_OK:
+				msg = "SMS sent";
+				break;
+			case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+				msg = "Generic failure";
+				break;
+			case SmsManager.RESULT_ERROR_NO_SERVICE:
+				msg = "No service";
+				break;
+			case SmsManager.RESULT_ERROR_NULL_PDU:
+				msg = "Null PDU";
+				break;
+			case SmsManager.RESULT_ERROR_RADIO_OFF:
+				msg = "Radio off";
+				break;
+			}
+		}
+	};
 
 	public class FullLocationListener implements LocationListener {
 		@Override
@@ -396,10 +402,12 @@ public class CameraLoggerActivity extends Activity implements
 
 		@Override
 		public void onProviderDisabled(String provider) {
+			HlprUtil.toast("GPS Disabled...", ctx, true);
 		}
 
 		@Override
 		public void onProviderEnabled(String provider) {
+			HlprUtil.toast("GPS Enabled...", ctx, true);
 		}
 
 		@Override

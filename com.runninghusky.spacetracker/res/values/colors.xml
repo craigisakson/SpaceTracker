@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="actionbar_separator">#a08162</color>
+	<color name="actionbar_background_start">#b95f06</color>
+	<color name="actionbar_background_end">#ec7a08</color>
+</resources> 

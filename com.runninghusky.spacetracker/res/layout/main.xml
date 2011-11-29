@@ -1,46 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.runninghusky.spacetracker"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/white"
     android:orientation="vertical" >
+
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        style="@style/ActionBar"
+        app:title="SpaceTracker" />
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/Title"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/gradient"
-            android:gravity="center_horizontal"
-            android:text="Flights"
-            android:textColor="@color/text"
-            android:textSize="9pt"
-            android:textStyle="bold" />
-
         <ListView
             android:id="@+id/ListViewFlights"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" 
-            android:paddingBottom="50dip"/>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="-50dip"
-            android:gravity="bottom" >
-
-            <Button
-                android:id="@+id/ButtonCreateFlight"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginTop="5dip"
-                android:text="Create a new flight" />
-        </RelativeLayout>
+            android:layout_height="fill_parent" />
     </LinearLayout>
 
 </LinearLayout>
