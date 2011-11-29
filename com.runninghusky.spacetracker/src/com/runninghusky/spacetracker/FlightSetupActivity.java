@@ -54,7 +54,7 @@ public class FlightSetupActivity extends Activity implements Runnable {
 				HlprUtil.toast("Changes canceled", this, true);
 				goBackIntent();
 			}else{
-				HlprUtil.toast("Please wait till loading is finsihed", this, true);
+				HlprUtil.toast("Please wait untill loading is complete", this, true);
 			}
 			return true;
 		}

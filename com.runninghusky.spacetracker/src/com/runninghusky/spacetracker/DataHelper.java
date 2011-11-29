@@ -220,6 +220,9 @@ public class DataHelper {
 					f.setDistance(String
 							.valueOf(HlprUtil.roundTwoDecimals(cursor
 									.getFloat(0) * 0.000621371192)));
+					if (f.getDistance() == null){
+						f.setDistance("0");
+					}
 				} while (cursor.moveToNext());
 			}
 			if (cursor != null && !cursor.isClosed()) {
