@@ -26,8 +26,8 @@
                 android:layout_height="fill_parent"
                 android:layout_marginBottom="50dip"
                 android:text="@string/eula"
-                android:textSize="8dip" 
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:textSize="8dip" />
         </ScrollView>
 
         <RelativeLayout
