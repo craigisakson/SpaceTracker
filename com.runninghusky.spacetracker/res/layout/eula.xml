@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.runninghusky.spacetracker"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        style="@style/ActionBar"
+        app:title="End User License Agreement" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
+
+            <TextView
+                android:id="@+id/TextViewFlights"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="50dip"
+                android:text="@string/eula"
+                android:textSize="8dip" 
+                android:textColor="@color/black"/>
+        </ScrollView>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-70dip"
+            android:background="@color/gray"
+            android:gravity="bottom" >
+
+            <TextView
+                android:id="@+id/TextViewQ"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Do you agree to the terms and conditions?"
+                android:textColor="@color/black" />
+
+            <Button
+                android:id="@+id/ButtonYes"
+                android:layout_width="155dip"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/TextViewQ"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="5dip"
+                android:text="Yes" />
+
+            <Button
+                android:id="@+id/ButtonNo"
+                android:layout_width="155dip"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/TextViewQ"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="5dip"
+                android:text="No" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

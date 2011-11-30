@@ -40,19 +40,20 @@
             </intent-filter>
         </activity>
         <activity
+            android:configChanges="keyboard|keyboardHidden|orientation"
             android:name=".FlightSetupActivity"
-            android:theme="@android:style/Theme.NoTitleBar"             android:configChanges="keyboard|keyboardHidden|orientation"
-            />
+            android:theme="@android:style/Theme.NoTitleBar" />
         <activity
-            android:name=".FlightHistoryActivity"
-            android:theme="@android:style/Theme.NoTitleBar"             android:configChanges="keyboard|keyboardHidden|orientation"
-            />
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:name=".EulaActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
         <activity
+            android:configChanges="keyboard|keyboardHidden|orientation"
             android:name=".FlightMapActivity"
-            android:theme="@android:style/Theme.NoTitleBar"             android:configChanges="keyboard|keyboardHidden|orientation"
-            />
-        <activity android:name=".CameraLoggerActivity"             android:configChanges="keyboard|keyboardHidden|orientation"
-            />
+            android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:name=".CameraLoggerActivity" />
         <activity android:name=".StopServiceActivity" />
 
         <service android:name=".FlightLogService" />

@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -68,6 +69,14 @@ public class SpaceTrackerActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
+		SharedPreferences sp = getSharedPreferences("spacetracker", 0);
+		if (!sp.getBoolean("agreedToEula", false)) {
+			Intent i = new Intent(SpaceTrackerActivity.this, EulaActivity.class);
+			SpaceTrackerActivity.this.startActivity(i);
+			finish();
+		}
+
 		actionBar = (ActionBar) findViewById(R.id.actionbar);
 		actionBar.addAction(new IntentAction(this, createQuickAddIntent(this),
 				android.R.drawable.ic_menu_add));

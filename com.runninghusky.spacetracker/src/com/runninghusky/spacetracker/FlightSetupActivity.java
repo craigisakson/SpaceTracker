@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -53,8 +54,9 @@ public class FlightSetupActivity extends Activity implements Runnable {
 			if (doneLoading) {
 				HlprUtil.toast("Changes canceled", this, true);
 				goBackIntent();
-			}else{
-				HlprUtil.toast("Please wait untill loading is complete", this, true);
+			} else {
+				HlprUtil.toast("Please wait untill loading is complete", this,
+						true);
 			}
 			return true;
 		}
@@ -74,7 +76,8 @@ public class FlightSetupActivity extends Activity implements Runnable {
 		isNew = b.getBoolean("isNew", false);
 
 		actionBar = (ActionBar) findViewById(R.id.actionbar);
-		actionBar.setTitle((isNew)?"Add Flight":"Edit Flight");
+		actionBar.setTitle((isNew) ? "Add Flight" : "Edit Flight");
+		actionBar.setProgressBarVisibility(View.VISIBLE);
 		autoCompleteStuff();
 		doMoreStuff();
 		Thread thread = new Thread(this);
@@ -287,10 +290,15 @@ public class FlightSetupActivity extends Activity implements Runnable {
 		@Override
 		public void handleMessage(Message msg) {
 			// pd.dismiss();
-			autoCompleteStuff();
-			btnSave.setEnabled(true);
-			doneLoading = true;
-			HlprUtil.toast("Loading finished...", ctx, true);
+			try {
+				actionBar.setProgressBarVisibility(View.INVISIBLE);
+				autoCompleteStuff();
+				btnSave.setEnabled(true);
+				doneLoading = true;
+				HlprUtil.toast("Loading finished...", ctx, true);
+			} catch (Exception e) {
+				Log.e("spacetracker", String.valueOf(e));
+			}
 		}
 	};
 }
