@@ -129,14 +129,13 @@ public class SpaceTrackerActivity extends Activity {
 				map.put("sendsms", "Send SMS:  "
 						+ String.valueOf(f.getSendSms()));
 				if (isMetric) {
+					map.put("distance", "Total Distance:  "
+							+ String.valueOf(HlprUtil.roundTwoDecimals(Double
+									.valueOf(f.getDistance()) * 1.609344))
+							+ " kms");
+				} else {
 					map.put("distance", "Total Distance:  " + f.getDistance()
 							+ " miles");
-				} else {
-					map.put("distance",
-							"Total Distance:  "
-									+ String.valueOf(Double.valueOf(f
-											.getDistance()) * 1.609344)
-									+ " kms");
 				}
 				mylist.add(map);
 				map = new HashMap<String, String>();
