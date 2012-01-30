@@ -3,7 +3,6 @@ package com.runninghusky.spacetracker;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -14,12 +13,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -36,6 +37,8 @@ public class FlightLogService extends Service {
 	public Integer i = 0;
 	public Location oldLoc;
 	public float distance;
+	private SharedPreferences prefs;
+	private Boolean isMetric = false;
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
@@ -69,6 +72,10 @@ public class FlightLogService extends Service {
 		this.dh = new DataHelper(this);
 		f = this.dh.selectFlightHistoryById(flightId);
 		this.dh.close();
+
+		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		isMetric = (prefs.getString("unit", "english").equals("english")) ? false
+				: true;
 
 		smsInterval = Long.valueOf(f.getSmsDuration()) * 1000;
 
@@ -208,28 +215,38 @@ public class FlightLogService extends Service {
 							"HH:mm:ss MM/dd/yyyy");
 					String strCal = sdf.format(date);
 
-					sendSMS(
-							f.getSmsNumber(true),
-							"http://maps.google.com/maps?q="
-									+ loc.getLatitude()
-									+ ","
-									+ loc.getLongitude()
-									+ "  Altitude: "
-									+ String
-											.valueOf(HlprUtil
-													.roundTwoDecimals(loc
-															.getAltitude() * 3.2808399))
-									+ " feet, Traveled: "
-									+ String
-											.valueOf(HlprUtil
-													.roundTwoDecimals(distance * 0.000621371192))
-									+ " miles, Current Speed: "
-									+ String
-											.valueOf(HlprUtil
-													.roundTwoDecimals(loc
-															.getSpeed() * 2.23693629))
-									+ " at " + strCal);
+					String altitude = "";
+					String dist = "";
+					String speed = "";
+					if (isMetric) {
+						altitude = String.valueOf(HlprUtil.roundTwoDecimals(loc
+								.getAltitude()))
+								+ " meters";
+						dist = String.valueOf(HlprUtil
+								.roundTwoDecimals(distance * 0.001))
+								+ " km";
+						speed = String.valueOf(HlprUtil.roundTwoDecimals(loc
+								.getSpeed() * 3.6))
+								+ "kph ";
+					} else {
+						altitude = String.valueOf(HlprUtil.roundTwoDecimals(loc
+								.getAltitude() * 3.2808399))
+								+ " feet";
+						dist = String.valueOf(HlprUtil
+								.roundTwoDecimals(distance * 0.000621371192))
+								+ " miles";
+						speed = String.valueOf(HlprUtil.roundTwoDecimals(loc
+								.getSpeed() * 2.23693629))
+								+ "mph ";
+					}
 
+					sendSMS(f.getSmsNumber(true),
+							"http://maps.google.com/maps?q="
+									+ loc.getLatitude() + ","
+									+ loc.getLongitude() + "  Altitude: "
+									+ altitude + ", Traveled: " + dist
+									+ ", Current Speed: " + speed + " at "
+									+ strCal);
 				} catch (Exception e) {
 					HlprUtil.toast("SMS error... " + String.valueOf(e), ctx,
 							true);

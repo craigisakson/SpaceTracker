@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
@@ -29,6 +30,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -62,6 +64,9 @@ public class CameraLoggerActivity extends Activity implements
 	boolean firstRun = true;
 	boolean shouldTakePics = true;
 	public Location oldLoc;
+	private SharedPreferences prefs;
+	private Boolean isMetric = false;
+	private Boolean notTakingPic = true;
 
 	// private ProgressDialog pd;
 
@@ -107,6 +112,9 @@ public class CameraLoggerActivity extends Activity implements
 		Settings.System.putInt(getContentResolver(),
 				Settings.System.SCREEN_OFF_TIMEOUT, DELAY);
 
+		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		isMetric = (prefs.getString("unit", "english").equals("english")) ? false
+				: true;
 		setupStart();
 	}
 
@@ -175,7 +183,7 @@ public class CameraLoggerActivity extends Activity implements
 	}
 
 	private void takePicture() {
-		System.out.println("takePicture()");
+		notTakingPic = false;
 		try {
 			mCamera.autoFocus(onFocus);
 		} catch (RuntimeException e) {
@@ -203,15 +211,24 @@ public class CameraLoggerActivity extends Activity implements
 			mCamera.stopPreview();
 		}
 
+		String sizePref = "";
+		sizePref = prefs.getString("resolution", "Not Present");
+
 		Camera.Parameters p = mCamera.getParameters();
-		List<Size> sizes = p.getSupportedPictureSizes();
-		Size s = sizes.get(0);
-		for (Size size : sizes) {
-			if (size.width > s.width) {
-				s = size;
+		if (sizePref.equals("Not Present")) {
+			List<Size> sizes = p.getSupportedPictureSizes();
+			Size s = sizes.get(0);
+			for (Size size : sizes) {
+				if (size.width > s.width) {
+					s = size;
+				}
 			}
+			p.setPictureSize(s.width, s.height);
+		} else {
+			String[] userResolution = sizePref.split(":");
+			p.setPictureSize(Integer.valueOf(userResolution[0]), Integer
+					.valueOf(userResolution[1]));
 		}
-		p.setPictureSize(s.width, s.height);
 
 		List<Size> previewSizes = p.getSupportedPreviewSizes();
 		p.setPreviewSize(previewSizes.get(0).width, previewSizes.get(0).height);
@@ -274,6 +291,7 @@ public class CameraLoggerActivity extends Activity implements
 				} catch (IOException e) {
 					e.printStackTrace();
 				} finally {
+					notTakingPic = true;
 					mCamera.startPreview();
 					setResult(FOTO_MODE, mIntent);
 				}
@@ -377,27 +395,38 @@ public class CameraLoggerActivity extends Activity implements
 							"HH:mm:ss MM/dd/yyyy");
 					String strCal = sdf.format(date);
 
-					sendSMS(
-							f.getSmsNumber(true),
+					String altitude = "";
+					String dist = "";
+					String speed = "";
+					if (isMetric) {
+						altitude = String.valueOf(HlprUtil.roundTwoDecimals(loc
+								.getAltitude()))
+								+ " meters";
+						dist = String.valueOf(HlprUtil
+								.roundTwoDecimals(distance * 0.001))
+								+ " km";
+						speed = String.valueOf(HlprUtil.roundTwoDecimals(loc
+								.getSpeed() * 3.6))
+								+ "kph ";
+					} else {
+						altitude = String.valueOf(HlprUtil.roundTwoDecimals(loc
+								.getAltitude() * 3.2808399))
+								+ " feet";
+						dist = String.valueOf(HlprUtil
+								.roundTwoDecimals(distance * 0.000621371192))
+								+ " miles";
+						speed = String.valueOf(HlprUtil.roundTwoDecimals(loc
+								.getSpeed() * 2.23693629))
+								+ "mph ";
+					}
+
+					sendSMS(f.getSmsNumber(true),
 							"http://maps.google.com/maps?q="
-									+ loc.getLatitude()
-									+ ","
-									+ loc.getLongitude()
-									+ "  Altitude: "
-									+ String
-											.valueOf(HlprUtil
-													.roundTwoDecimals(loc
-															.getAltitude() * 3.2808399))
-									+ " feet, Traveled: "
-									+ String
-											.valueOf(HlprUtil
-													.roundTwoDecimals(distance * 0.000621371192))
-									+ " miles, Current Speed: "
-									+ String
-											.valueOf(HlprUtil
-													.roundTwoDecimals(loc
-															.getSpeed() * 2.23693629))
-									+ " at " + strCal);
+									+ loc.getLatitude() + ","
+									+ loc.getLongitude() + "  Altitude: "
+									+ altitude + ", Traveled: " + dist
+									+ ", Current Speed: " + speed + " at "
+									+ strCal);
 
 				} catch (Exception e) {
 					HlprUtil.toast("SMS error... " + String.valueOf(e), ctx,
@@ -459,11 +488,13 @@ public class CameraLoggerActivity extends Activity implements
 			try {
 				Thread.sleep(picInterval);
 				if (shouldTakePics) {
-					try {
-						takePicture();
-					} catch (Exception e) {
-						HlprUtil.toast("Error taking picture... "
-								+ String.valueOf(e), ctx, true);
+					if (notTakingPic) {
+						try {
+							takePicture();
+						} catch (Exception e) {
+							HlprUtil.toast("Error taking picture... "
+									+ String.valueOf(e), ctx, true);
+						}
 					}
 				} else {
 					return;

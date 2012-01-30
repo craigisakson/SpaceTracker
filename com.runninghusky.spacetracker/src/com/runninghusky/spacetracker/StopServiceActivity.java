@@ -1,8 +1,6 @@
 package com.runninghusky.spacetracker;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,16 +14,17 @@ public class StopServiceActivity extends Activity {
 		finish();
 	}
 
-//	private boolean myServiceIsRunning() {
-//		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-//		for (RunningServiceInfo service : manager
-//				.getRunningServices(Integer.MAX_VALUE)) {
-//			if ("com.runninghusky.rdo.sample.UploadService"
-//					.equals(service.service.getClassName())) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
+	// private boolean myServiceIsRunning() {
+	// ActivityManager manager = (ActivityManager)
+	// getSystemService(ACTIVITY_SERVICE);
+	// for (RunningServiceInfo service : manager
+	// .getRunningServices(Integer.MAX_VALUE)) {
+	// if ("com.runninghusky.rdo.sample.UploadService"
+	// .equals(service.service.getClassName())) {
+	// return true;
+	// }
+	// }
+	// return false;
+	// }
 
 }

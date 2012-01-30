@@ -66,6 +66,13 @@
                 android:text="Take Pictures"
                 android:textColor="@color/text" />
 
+<!--            <CheckBox-->
+<!--                android:id="@+id/CheckBoxContinuousShooting"-->
+<!--                android:layout_width="fill_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Continuous Shooting"-->
+<!--                android:textColor="@color/text" />-->
+
             <TableLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"

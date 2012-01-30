@@ -151,9 +151,13 @@ public class FlightSetupActivity extends Activity implements Runnable {
 			err += "Sms Update Interval must be greater than 5 seconds";
 		}
 		if (HlprUtil.convertTimeToSeconds(String.valueOf(picUpdateInterval
-				.getText())) < 5
+				.getText())) < 2
 				&& cbSendPicture.isChecked()) {
-			err += "Pic Update Interval must be greater than 55 seconds";
+			// HlprUtil
+			// .toast(
+			// "Pic Update Intervals under 5 seconds will place the logger in continuous shooting mode",
+			// ctx, false);
+			err += "Pic Update Interval must be greater than 2 seconds";
 		}
 		if (err.equals("")) {
 			this.dh = new DataHelper(this);

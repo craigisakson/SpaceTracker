@@ -17,8 +17,11 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
@@ -41,6 +44,8 @@ public class SpaceTrackerActivity extends Activity {
 	private String flightName;
 	public Context ctx = this;
 	private ActionBar actionBar;
+	private SharedPreferences prefs;
+	private Boolean isMetric = false;
 
 	// for preferences...
 	String UnitPref;
@@ -80,6 +85,11 @@ public class SpaceTrackerActivity extends Activity {
 		actionBar = (ActionBar) findViewById(R.id.actionbar);
 		actionBar.addAction(new IntentAction(this, createQuickAddIntent(this),
 				android.R.drawable.ic_menu_add));
+
+		prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		isMetric = (prefs.getString("unit", "english").equals("english")) ? false
+				: true;
+
 		setupStart();
 	}
 
@@ -118,8 +128,16 @@ public class SpaceTrackerActivity extends Activity {
 						+ String.valueOf(f.getTakePic()));
 				map.put("sendsms", "Send SMS:  "
 						+ String.valueOf(f.getSendSms()));
-				map.put("distance", "Total Distance:  " + f.getDistance()
-						+ " miles");
+				if (isMetric) {
+					map.put("distance", "Total Distance:  " + f.getDistance()
+							+ " miles");
+				} else {
+					map.put("distance",
+							"Total Distance:  "
+									+ String.valueOf(Double.valueOf(f
+											.getDistance()) * 1.609344)
+									+ " kms");
+				}
 				mylist.add(map);
 				map = new HashMap<String, String>();
 			}
@@ -374,6 +392,27 @@ public class SpaceTrackerActivity extends Activity {
 		b.putBoolean("isNew", true);
 		i.putExtras(b);
 		return i;
+	}
+
+	/* Creates the menu items */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.preferences:
+			Intent myIntent = new Intent(SpaceTrackerActivity.this,
+					Preferences.class);
+			SpaceTrackerActivity.this.startActivity(myIntent);
+			finish();
+			break;
+		}
+		return true;
 	}
 
 }

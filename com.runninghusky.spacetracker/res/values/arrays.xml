@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <resources>
 
-<string-array name="selectMapView">
-	<item>SatelliteView</item>
-<!--	<item>StreetView</item>-->
-	<item>MapView</item>
-</string-array>
-	
+    <string-array name="selectMapView">
+        <item>SatelliteView</item>
+        <item>MapView</item>
+    </string-array>
+    <string-array name="unit">
+        <item>English</item>
+        <item>Metric</item>
+    </string-array>
+    <string-array name="unitvalues">
+        <item>english</item>
+        <item>metric</item>
+    </string-array>
+
 </resources>
