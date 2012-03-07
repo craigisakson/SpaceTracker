@@ -3,12 +3,15 @@ package com.runninghusky.spacetracker;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +20,8 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -26,19 +31,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.AdapterView.OnItemClickListener;
+
 
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 
-public class SpaceTrackerActivity extends Activity {
+public class SpaceTrackerActivity extends Activity implements Runnable {
 	// private ProgressDialog pd;
 	private SimpleAdapter mFlight;
 	private List<FlightData> flightData = new ArrayList<FlightData>();
 	private DataHelper dh;
-	private Boolean blnHistoryExist;
+	private Boolean blnHistoryExist, isGps;
 	private ListView lvl;
 	private long flightId;
 	private String flightName;
@@ -46,18 +52,19 @@ public class SpaceTrackerActivity extends Activity {
 	private ActionBar actionBar;
 	private SharedPreferences prefs;
 	private Boolean isMetric = false;
+	private ProgressDialog pd;
 
 	// for preferences...
 	String UnitPref;
 
 	protected static final int CONTEXT_RUN = 1;
-	// protected static final int CONTEXT_STOP = 6;
 	protected static final int CONTEXT_EDIT = 2;
 	protected static final int CONTEXT_OPEN = 3;
 	protected static final int CONTEXT_EXPORT_KML = 4;
 	protected static final int CONTEXT_DELETE = 5;
 	protected static final int CONTEXT_MAP = 7;
 	protected static final int CONTEXT_RESET = 8;
+	protected static final int CONTEXT_EXPORT_GPS = 9;
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -117,22 +124,26 @@ public class SpaceTrackerActivity extends Activity {
 			for (Flight f : flightList) {
 				map.put("id", Long.toString(f.getId()));
 				map.put("name", f.getName());
-				map.put("update", "SMS Update Interval (hh:mm:ss):  "
-						+ HlprUtil.convertSecondsToTime(Double.valueOf(f
-								.getSmsDuration())));
-				map.put("picupdate", "Pic Update Interval (hh:mm:ss):  "
-						+ HlprUtil.convertSecondsToTime(Double.valueOf(f
-								.getPicDuration())));
+				map.put("update",
+						"SMS Update Interval (hh:mm:ss):  "
+								+ HlprUtil.convertSecondsToTime(Double
+										.valueOf(f.getSmsDuration())));
+				map.put("picupdate",
+						"Pic Update Interval (hh:mm:ss):  "
+								+ HlprUtil.convertSecondsToTime(Double
+										.valueOf(f.getPicDuration())));
 				map.put("smsnum", "SMS Number:  " + f.getSmsNumber(false));
-				map.put("sendpics", "Send pics:  "
-						+ String.valueOf(f.getTakePic()));
-				map.put("sendsms", "Send SMS:  "
-						+ String.valueOf(f.getSendSms()));
+				map.put("sendpics",
+						"Send pics:  " + String.valueOf(f.getTakePic()));
+				map.put("sendsms",
+						"Send SMS:  " + String.valueOf(f.getSendSms()));
 				if (isMetric) {
-					map.put("distance", "Total Distance:  "
-							+ String.valueOf(HlprUtil.roundTwoDecimals(Double
-									.valueOf(f.getDistance()) * 1.609344))
-							+ " kms");
+					map.put("distance",
+							"Total Distance:  "
+									+ String.valueOf(HlprUtil
+											.roundTwoDecimals(Double.valueOf(f
+													.getDistance()) * 1.609344))
+									+ " kms");
 				} else {
 					map.put("distance", "Total Distance:  " + f.getDistance()
 							+ " miles");
@@ -175,7 +186,8 @@ public class SpaceTrackerActivity extends Activity {
 				// menu.add(0, CONTEXT_OPEN, 4, "View History");
 				menu.add(0, CONTEXT_DELETE, 5, "Delete Flight");
 				menu.add(0, CONTEXT_EXPORT_KML, 6, "Export KML");
-				menu.add(0, CONTEXT_RESET, 7, "Reset Track");
+				menu.add(0, CONTEXT_EXPORT_GPS, 7, "Export All GPS (.csv)");
+				menu.add(0, CONTEXT_RESET, 8, "Reset Track");
 			}
 		});
 
@@ -217,8 +229,10 @@ public class SpaceTrackerActivity extends Activity {
 			resetFlight("delete");
 			break;
 		case CONTEXT_EXPORT_KML:
-			getSomeDataForEmail();
-			sendEmailKML();
+			setupEmailData(false);
+			break;
+		case CONTEXT_EXPORT_GPS:
+			setupEmailData(true);
 			break;
 		case CONTEXT_MAP:
 			initMap();
@@ -346,41 +360,71 @@ public class SpaceTrackerActivity extends Activity {
 		this.dh.close();
 	}
 
-	private void sendEmailKML() {
-		// this.dh = new DataHelper(this);
+	private void setupEmailData(Boolean b) {
+		isGps = b;
+		pd = ProgressDialog.show(this, "", "Building CSV...", true, false);
+		Thread thread = new Thread(this);
+		thread.start();
+	}
+
+	private void sendEmail() {
+		String ele = (isMetric) ? "(meters)" : "(feet)";
+		String sd = (isMetric) ? "(kmh)" : "(mph)";
+		String d = (isMetric) ? "(kilometers)" : "(miles)";
+
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss MM/dd/yyyy");
 
 		try {
 			File root = Environment.getExternalStorageDirectory();
-			File gpxfile = new File(root, "spacetracker.kml");
-			FileWriter writer = new FileWriter(gpxfile);
+			FileWriter writer = new FileWriter((isGps) ? new File(root,
+					"spacetracker.csv") : new File(root, "spacetracker.kml"));
 
-			writer
-					.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n<Document>\n<name>\nSpaceTracker</name>\n<Style id=\"yellowLineGreenPoly\">\n<LineStyle>\n<color>\n7f00ffff</color>\n<width>\n4</width>\n</LineStyle>\n</Style>\n<Placemark>\n<name>\nNo name</name>\n<description>\nTrack Created by SpaceTracker</description>\n<styleUrl>\n#yellowLineGreenPoly</styleUrl>\n<LineString>\n<altitudeMode>absolute</altitudeMode>\n<extrude>1</extrude>\n<tessellate>1</tessellate>\n<coordinates>\n");
-			for (FlightData fd : flightData) {
-				writer.append(fd.getLongitude() + "," + fd.getLatitude() + ","
-						+ fd.getElevation() + "\n");
+			if (isGps) {
+				writer.append("\"longitude\",\"latitude\",\"altitude " + ele
+						+ "\",\"speed " + sd + "\",\"distance " + d
+						+ "\",\"time\",\"accuracy\",\"bearing\"\n");
+				for (FlightData fd : flightData) {
+					writer.append(String.valueOf(fd.getLongitude()) + ",");
+					writer.append(String.valueOf(fd.getLatitude()) + ",");
+					if (isMetric) {
+						writer.append(String.valueOf(HlprUtil
+								.roundTwoDecimals(fd.getElevation())) + ",");
+						writer.append(String.valueOf(HlprUtil
+								.roundTwoDecimals(fd.getSpeed() * 3.6)) + ",");
+						writer.append(String.valueOf(HlprUtil
+								.roundTwoDecimals(fd.getDistance() * 0.001))
+								+ ",");
+					} else {
+						writer.append(String.valueOf(HlprUtil
+								.roundTwoDecimals(fd.getElevation() * 3.2808399))
+								+ ",");
+						writer.append(String.valueOf(HlprUtil
+								.roundTwoDecimals(fd.getSpeed() * 2.23693629))
+								+ ",");
+						writer.append(String.valueOf(HlprUtil
+								.roundTwoDecimals(fd.getDistance() * 0.000621371192))
+								+ ",");
+					}
+					writer.append(sdf.format(new Date(fd.getTime())) + ",");
+					writer.append(String.valueOf(fd.getAccuracy()) + ",");
+					writer.append(String.valueOf(fd.getBearing()) + "\n");
+				}
+			} else {
+				writer.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n<Document>\n<name>\nSpaceTracker</name>\n<Style id=\"yellowLineGreenPoly\">\n<LineStyle>\n<color>\n7f00ffff</color>\n<width>\n4</width>\n</LineStyle>\n</Style>\n<Placemark>\n<name>\nNo name</name>\n<description>\nTrack Created by SpaceTracker</description>\n<styleUrl>\n#yellowLineGreenPoly</styleUrl>\n<LineString>\n<altitudeMode>absolute</altitudeMode>\n<extrude>1</extrude>\n<tessellate>1</tessellate>\n<coordinates>\n");
+				for (FlightData fd : flightData) {
+					writer.append(fd.getLongitude() + "," + fd.getLatitude()
+							+ "," + fd.getElevation() + "\n");
+				}
+
+				writer.append("</coordinates>\n</LineString>\n</Placemark>\n</Document>\n</kml>\n");
 			}
-
-			writer
-					.append("</coordinates>\n</LineString>\n</Placemark>\n</Document>\n</kml>\n");
 
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		Intent sendIntent = new Intent(Intent.ACTION_SEND);
-		sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Space Tracker KML");
-		sendIntent.setType("text/htm");
-		sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"
-				+ Environment.getExternalStorageDirectory()
-				+ "/spacetracker.kml"));
-		sendIntent.putExtra(Intent.EXTRA_STREAM, Uri
-				.parse("file:///sdcard/spacetracker.kml"));
-		sendIntent.putExtra(Intent.EXTRA_TEXT, "Thanks!!");
-		startActivity(Intent.createChooser(sendIntent, "Email:"));
-
+		handler.sendEmptyMessage(0);
 	}
 
 	private static Intent createQuickAddIntent(Context context) {
@@ -414,4 +458,42 @@ public class SpaceTrackerActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	public void run() {
+		getSomeDataForEmail();
+		sendEmail();
+		handler.sendEmptyMessage(0);
+	}
+
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			pd.dismiss();
+			Intent sendIntent = new Intent(Intent.ACTION_SEND);
+			if (isGps) {
+				sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Space Tracker GPS");
+				sendIntent.setType("text/htm");
+				sendIntent.putExtra(
+						Intent.EXTRA_STREAM,
+						Uri.parse("file://"
+								+ Environment.getExternalStorageDirectory()
+								+ "/spacetracker.csv"));
+				sendIntent.putExtra(Intent.EXTRA_STREAM,
+						Uri.parse("file:///sdcard/spacetracker.csv"));
+			} else {
+				sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Space Tracker KML");
+				sendIntent.setType("text/htm");
+				sendIntent.putExtra(
+						Intent.EXTRA_STREAM,
+						Uri.parse("file://"
+								+ Environment.getExternalStorageDirectory()
+								+ "/spacetracker.kml"));
+				sendIntent.putExtra(Intent.EXTRA_STREAM,
+						Uri.parse("file:///sdcard/spacetracker.kml"));
+			}
+			sendIntent.putExtra(Intent.EXTRA_TEXT, "Thanks!!");
+			startActivity(Intent.createChooser(sendIntent, "Email:"));
+
+		}
+	};
 }
